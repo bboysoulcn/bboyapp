@@ -52,12 +52,16 @@ async def _sync_events(client: And8Client) -> None:
                 source_id=item["source_id"],
                 title=item["title"],
                 date=parsed_date,
+                location=item.get("location"),
+                country=item.get("country"),
                 poster_url=item.get("poster_url"),
                 source_url=item.get("source_url"),
             ).on_conflict_do_update(
                 index_elements=["source_id"],
                 set_={
                     "title": item["title"],
+                    "location": item.get("location"),
+                    "country": item.get("country"),
                     "poster_url": item.get("poster_url"),
                     "source_url": item.get("source_url"),
                 },

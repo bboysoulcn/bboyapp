@@ -58,6 +58,7 @@ class And8Client:
                 "location": venue_text,
                 "country": country,
                 "source_url": BASE_URL + "/" + href,
+                "poster_url": f"https://cdn.and8.dance/gfx/poster/1/200/{source_id}.jpg",
             })
         return events
 
@@ -88,7 +89,7 @@ class And8Client:
                 artists.append({
                     "source_id": source_id,
                     "name": name,
-                    "avatar_url": img_el.get("src") if img_el else None,
+                    "avatar_url": f"https://cdn.and8.dance/data/artist/{source_id}.jpg",
                 })
         return artists
 
@@ -118,7 +119,7 @@ class And8Client:
                 groups.append({
                     "source_id": source_id,
                     "name": name,
-                    "logo_url": img_el.get("src") if img_el else None,
+                    "logo_url": f"https://cdn.and8.dance/data/group/{source_id}.jpg",
                 })
         return groups
 
