@@ -31,64 +31,95 @@ class And8Client:
             return None
 
     async def fetch_events(self) -> list[dict[str, Any]]:
-        """爬取赛事列表"""
-        soup = await self._get("/en/events")
+        """爬取赛事列表（来自 /en/events/overview 的 tr.d_list 行）"""
+        soup = await self._get("/en/events/overview")
         if not soup:
             return []
         events = []
-        for item in soup.select("article, .event-item, [data-event-id]"):
-            source_id = item.get("data-event-id") or item.get("id", "")
-            title_el = item.select_one("h2, h3, .event-title, .title")
-            date_el = item.select_one("time, .date, [datetime]")
-            link_el = item.select_one("a[href]")
-            img_el = item.select_one("img")
-            if not source_id or not title_el:
+        for row in soup.select("tr.d_list"):
+            link_el = row.select_one("td:nth-child(2) a[href]")
+            if not link_el:
                 continue
+            href = link_el.get("href", "")
+            # href 格式：en/e/5360
+            parts = href.strip("/").split("/")
+            source_id = parts[-1] if parts else None
+            if not source_id:
+                continue
+            date_td = row.select_one("td.dateRange")
+            venue_td = row.select_one("td:nth-child(3)")
+            flag_img = venue_td.select_one("img[alt]") if venue_td else None
+            country = flag_img.get("alt") if flag_img else None
+            venue_text = venue_td.get_text(strip=True) if venue_td else None
             events.append({
-                "source_id": str(source_id),
-                "title": title_el.get_text(strip=True),
-                "date_str": date_el.get("datetime") or date_el.get_text(strip=True) if date_el else None,
-                "poster_url": img_el.get("src") or img_el.get("data-src") if img_el else None,
-                "source_url": BASE_URL + link_el["href"] if link_el else None,
+                "source_id": source_id,
+                "title": link_el.get_text(strip=True),
+                "date_str": date_td.get_text(strip=True).split("\n")[0] if date_td else None,
+                "location": venue_text,
+                "country": country,
+                "source_url": BASE_URL + "/" + href,
             })
         return events
 
     async def fetch_artists(self) -> list[dict[str, Any]]:
-        """爬取艺术家列表"""
-        soup = await self._get("/en/artists/")
-        if not soup:
-            return []
+        """爬取艺术家列表（按字母分页：en/artists/A .. Z）"""
+        import re
         artists = []
-        for item in soup.select("[data-artist-id], .artist-card, article"):
-            source_id = item.get("data-artist-id") or item.get("id", "")
-            name_el = item.select_one("h2, h3, .name, .artist-name")
-            img_el = item.select_one("img")
-            if not source_id or not name_el:
+        seen_ids: set[str] = set()
+        pages = ["Nr"] + list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        for letter in pages:
+            soup = await self._get(f"/en/artists/{letter}")
+            if not soup:
                 continue
-            artists.append({
-                "source_id": str(source_id),
-                "name": name_el.get_text(strip=True),
-                "avatar_url": img_el.get("src") if img_el else None,
-            })
+            for a in soup.find_all("a", href=True):
+                m = re.search(r"/artist/(\d+)/", a["href"])
+                if not m:
+                    continue
+                source_id = m.group(1)
+                if source_id in seen_ids:
+                    continue
+                seen_ids.add(source_id)
+                name = a.get_text(strip=True)
+                if not name:
+                    continue
+                # 尝试获取头像（同行 img）
+                parent = a.find_parent()
+                img_el = parent.find("img") if parent else None
+                artists.append({
+                    "source_id": source_id,
+                    "name": name,
+                    "avatar_url": img_el.get("src") if img_el else None,
+                })
         return artists
 
     async def fetch_groups(self) -> list[dict[str, Any]]:
-        """爬取团队列表"""
-        soup = await self._get("/en/groups")
-        if not soup:
-            return []
+        """爬取团队列表（按字母分页：en/groups/A .. Z）"""
+        import re
         groups = []
-        for item in soup.select("[data-group-id], .group-card, article"):
-            source_id = item.get("data-group-id") or item.get("id", "")
-            name_el = item.select_one("h2, h3, .name")
-            img_el = item.select_one("img")
-            if not source_id or not name_el:
+        seen_ids: set[str] = set()
+        pages = ["Nr"] + list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        for letter in pages:
+            soup = await self._get(f"/en/groups/{letter}")
+            if not soup:
                 continue
-            groups.append({
-                "source_id": str(source_id),
-                "name": name_el.get_text(strip=True),
-                "logo_url": img_el.get("src") if img_el else None,
-            })
+            for a in soup.find_all("a", href=True):
+                m = re.search(r"/group/(\d+)/", a["href"])
+                if not m:
+                    continue
+                source_id = m.group(1)
+                if source_id in seen_ids:
+                    continue
+                seen_ids.add(source_id)
+                name = a.get_text(strip=True)
+                if not name:
+                    continue
+                parent = a.find_parent()
+                img_el = parent.find("img") if parent else None
+                groups.append({
+                    "source_id": source_id,
+                    "name": name,
+                    "logo_url": img_el.get("src") if img_el else None,
+                })
         return groups
 
     async def fetch_battle_reports(self) -> list[dict[str, Any]]:
