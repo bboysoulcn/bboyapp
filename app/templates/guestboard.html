@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}留言板{% endblock %}
+
+{% block head %}
+<style>
+  .pin-form { display: none; }
+  .pin-form.show { display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-3xl font-bold mb-2">留言板</h1>
+  <p class="text-gray-500">分享你的街舞故事与想法</p>
+</div>
+
+<!-- 发送验证码表单 -->
+<div class="bg-white rounded-2xl shadow-md p-6 mb-8" id="submit-section">
+  {% if success %}
+  <div class="text-green-600 bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+    ✅ 留言已发布！感谢你的分享。
+  </div>
+  {% elif error %}
+  <div class="text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+    ❌ {{ error }}
+  </div>
+  {% endif %}
+
+  <h2 class="text-lg font-bold mb-4">发表留言</h2>
+
+  <!-- 第一步：填写内容 -->
+  <form id="submit-form" method="post" action="/guestboard/submit" class="space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">昵称 <span class="text-red-500">*</span></label>
+        <input type="text" name="nickname" required maxlength="64"
+               class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+               placeholder="你的昵称"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">邮箱 <span class="text-red-500">*</span></label>
+        <input type="email" name="email" required
+               class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+               placeholder="用于接收验证码，不会公开"/>
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">留言内容 <span class="text-red-500">*</span></label>
+      <textarea name="content" required rows="4" maxlength="1000"
+                class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand resize-none"
+                placeholder="写下你想说的话..."></textarea>
+    </div>
+    <button type="submit" class="bg-brand text-white px-6 py-2 rounded-xl font-medium hover:bg-orange-600 transition-colors">
+      发送验证码
+    </button>
+  </form>
+
+  <!-- 第二步：输入 PIN（通过 URL 参数判断） -->
+  {% if pending_id %}
+  <form method="post" action="/guestboard/verify" class="mt-6 pt-6 border-t space-y-4">
+    <input type="hidden" name="message_id" value="{{ pending_id }}"/>
+    <p class="text-sm text-gray-600">📧 验证码已发送至你的邮箱，请在 10 分钟内输入：</p>
+    <div class="flex gap-3">
+      <input type="text" name="pin" required maxlength="6" pattern="\d{6}"
+             class="border border-gray-200 rounded-xl px-4 py-2 text-lg font-mono tracking-widest w-40 text-center focus:outline-none focus:ring-2 focus:ring-brand"
+             placeholder="123456"/>
+      <button type="submit" class="bg-brand text-white px-6 py-2 rounded-xl font-medium hover:bg-orange-600 transition-colors">
+        验证并发布
+      </button>
+    </div>
+  </form>
+  {% endif %}
+</div>
+
+<!-- 留言列表 -->
+<div class="space-y-4">
+  <h2 class="text-xl font-bold">全部留言 <span class="text-gray-400 font-normal text-base">({{ total }})</span></h2>
+  {% for msg in messages %}
+  <div class="bg-white rounded-2xl shadow-sm p-5">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-brand font-bold text-sm">
+        {{ msg.nickname[0].upper() }}
+      </div>
+      <div>
+        <p class="font-semibold text-gray-900">{{ msg.nickname }}</p>
+        <p class="text-xs text-gray-400">{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+      </div>
+    </div>
+    <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{{ msg.content }}</p>
+  </div>
+  {% else %}
+  <div class="text-center py-16 text-gray-400">
+    <p class="text-5xl mb-4">💬</p>
+    <p>还没有留言，来说第一句话吧！</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

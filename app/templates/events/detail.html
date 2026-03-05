@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <a href="/events" class="text-brand text-sm hover:underline mb-4 inline-block">← 返回赛事列表</a>
+
+  <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+    {% if event.poster_url %}
+    <img src="{{ event.poster_url }}" alt="{{ event.title }}" class="w-full max-h-80 object-cover"/>
+    {% else %}
+    <div class="w-full h-48 bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-7xl">🏆</div>
+    {% endif %}
+
+    <div class="p-6">
+      <h1 class="text-2xl font-bold mb-4">{{ event.title }}</h1>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
+        <div class="flex items-start gap-2">
+          <span class="text-xl">📅</span>
+          <div>
+            <p class="font-medium text-gray-700">日期</p>
+            <p class="text-gray-500">{{ event.date.strftime('%Y年%m月%d日') }}
+              {% if event.end_date and event.end_date != event.date %} — {{ event.end_date.strftime('%Y年%m月%d日') }}{% endif %}
+            </p>
+          </div>
+        </div>
+        {% if event.location %}
+        <div class="flex items-start gap-2">
+          <span class="text-xl">📍</span>
+          <div>
+            <p class="font-medium text-gray-700">地点</p>
+            <p class="text-gray-500">{{ event.location }}{% if event.country %}, {{ event.country }}{% endif %}</p>
+          </div>
+        </div>
+        {% endif %}
+        {% if event.level %}
+        <div class="flex items-start gap-2">
+          <span class="text-xl">🏅</span>
+          <div>
+            <p class="font-medium text-gray-700">级别</p>
+            <p class="text-gray-500">{{ {'international':'国际','national':'全国','local':'地区'}.get(event.level, event.level) }}</p>
+          </div>
+        </div>
+        {% endif %}
+        {% if event.dance_styles %}
+        <div class="flex items-start gap-2">
+          <span class="text-xl">🎵</span>
+          <div>
+            <p class="font-medium text-gray-700">舞种</p>
+            <div class="flex flex-wrap gap-1 mt-1">
+              {% for style in event.dance_styles %}
+              <span class="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full">{{ style }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <a href="/events/calendar.ics?event_id={{ event.id }}"
+           class="flex items-center gap-2 bg-brand text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
+          📅 下载 iCal
+        </a>
+        {% if event.source_url %}
+        <a href="{{ event.source_url }}" target="_blank"
+           class="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+          🔗 查看原始页面
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

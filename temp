@@ -1,0 +1,21 @@
+我要写一个网站类似https://and8.dance/ 
+
+技术点如下
+
+使用fastapi作为后端 postgresql作为数据库  SQLAlchemy 作为 ORM 
+Alembic 管理数据库迁移
+响应式设计加pwa 
+使用github action 构建成docker 镜像 打上版本tag才可以构建
+整体UI 模仿 https://www.bboy.app 
+卡片式设计（艺术家头像、赛事海报都用卡片）
+
+功能点如下
+
+活动日历系统 https://and8.dance/en/events 
+要有赛事时间轴功能 订阅功能：iCal 导出，让用户添加到自己的日历应用 过滤功能：按地区、级别（国际/国家/地区）、舞种（Breaking/Popping/Locking 等）筛选
+
+艺术家档案库 https://and8.dance/en/artists/
+团队 https://and8.dance/en/groups
+留言板 
+
+赛事结果 https://and8.dance/en/stats (Battle 树状图)

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Battle 回顾 — {{ report.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <a href="/stats/{{ report.source_id }}" class="text-brand text-sm hover:underline mb-4 inline-block">← 返回赛事详情</a>
+
+  <div class="bg-white rounded-2xl shadow-md p-6">
+    <h1 class="text-xl font-bold mb-2">{{ report.title }}</h1>
+    <p class="text-gray-500 text-sm mb-6">Battle 对战回顾</p>
+
+    {% if round_data %}
+    <div class="space-y-4">
+      {% for battle in round_data %}
+      <div class="border border-gray-100 rounded-xl p-4">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex-1 text-right">
+            <p class="font-bold {% if battle.winner == battle.player1 %}text-brand{% endif %}">
+              {{ battle.player1 or '未知' }}
+            </p>
+          </div>
+          <div class="text-center px-4">
+            <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-medium">VS</span>
+            {% if battle.winner %}
+            <p class="text-xs text-green-600 mt-1">🏆 {{ battle.winner }}</p>
+            {% endif %}
+          </div>
+          <div class="flex-1">
+            <p class="font-bold {% if battle.winner == battle.player2 %}text-brand{% endif %}">
+              {{ battle.player2 or '未知' }}
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12 text-gray-400">
+      <p class="text-4xl mb-4">⚔️</p>
+      <p>暂无对战数据</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

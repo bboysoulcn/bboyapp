@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ artist.nickname or artist.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <a href="/artists" class="text-brand text-sm hover:underline mb-4 inline-block">← 返回艺术家列表</a>
+
+  <div class="bg-white rounded-2xl shadow-md p-8 text-center">
+    <div class="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gray-100 shadow-lg mb-4">
+      {% if artist.avatar_url %}
+      <img src="{{ artist.avatar_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover"/>
+      {% else %}
+      <div class="w-full h-full flex items-center justify-center text-5xl bg-orange-50">👤</div>
+      {% endif %}
+    </div>
+    <h1 class="text-2xl font-bold">{{ artist.nickname or artist.name }}</h1>
+    {% if artist.nickname %}<p class="text-gray-500 mt-1">{{ artist.name }}</p>{% endif %}
+    {% if artist.country %}<p class="text-brand font-medium mt-1">{{ artist.country }}</p>{% endif %}
+
+    {% if artist.dance_styles %}
+    <div class="flex flex-wrap justify-center gap-2 mt-4">
+      {% for style in artist.dance_styles %}
+      <span class="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">{{ style }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if artist.bio %}
+    <p class="text-gray-600 text-sm mt-6 text-left leading-relaxed">{{ artist.bio }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

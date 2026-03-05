@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}艺术家{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-3xl font-bold mb-2">艺术家</h1>
+  <p class="text-gray-500">街舞艺术家档案库</p>
+</div>
+
+<!-- 搜索 -->
+<form method="get" class="mb-8 flex gap-3">
+  <input type="text" name="q" value="{{ query or '' }}" placeholder="搜索艺术家名称..."
+         class="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"/>
+  <button type="submit" class="bg-brand text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 transition-colors">搜索</button>
+</form>
+
+{% if artists %}
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+  {% for artist in artists %}
+  <a href="/artists/{{ artist.id }}" class="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 text-center">
+    <div class="w-20 h-20 mx-auto rounded-full overflow-hidden bg-gray-100 shadow mb-3">
+      {% if artist.avatar_url %}
+      <img src="{{ artist.avatar_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"/>
+      {% else %}
+      <div class="w-full h-full flex items-center justify-center text-3xl bg-orange-50">👤</div>
+      {% endif %}
+    </div>
+    <p class="font-bold text-sm text-gray-900 group-hover:text-brand transition-colors truncate">{{ artist.nickname or artist.name }}</p>
+    {% if artist.nickname %}<p class="text-xs text-gray-500 truncate">{{ artist.name }}</p>{% endif %}
+    {% if artist.country %}<p class="text-xs text-gray-400 mt-0.5">{{ artist.country }}</p>{% endif %}
+    {% if artist.dance_styles %}
+    <div class="flex flex-wrap justify-center gap-1 mt-2">
+      {% for style in artist.dance_styles[:2] %}
+      <span class="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">{{ style }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-20 text-gray-400">
+  <p class="text-6xl mb-4">🎤</p>
+  <p>{% if query %}没有找到"{{ query }}"相关艺术家{% else %}暂无艺术家数据{% endif %}</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}首页{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="text-center py-12">
+  <h1 class="text-4xl md:text-5xl font-bold mb-4">🕺 BBoyApp</h1>
+  <p class="text-gray-500 text-lg">街舞赛事 · 艺术家 · 团队 · 社区</p>
+</section>
+
+<!-- 近期赛事 -->
+<section class="mb-12">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold">近期赛事</h2>
+    <a href="/events" class="text-brand text-sm font-medium hover:underline">查看全部 →</a>
+  </div>
+  {% if events %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for event in events %}
+    <a href="/events/{{ event.id }}" class="group block bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+      {% if event.poster_url %}
+      <div class="aspect-video overflow-hidden bg-gray-100">
+        <img src="{{ event.poster_url }}" alt="{{ event.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+      </div>
+      {% else %}
+      <div class="aspect-video bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-5xl">🏆</div>
+      {% endif %}
+      <div class="p-4">
+        <p class="text-xs text-brand font-semibold mb-1">{{ event.date.strftime('%Y年%m月%d日') }}</p>
+        <h3 class="font-bold text-gray-900 line-clamp-2 mb-2">{{ event.title }}</h3>
+        {% if event.location %}
+        <p class="text-gray-500 text-sm flex items-center gap-1">
+          <span>📍</span> {{ event.location }}{% if event.country %}, {{ event.country }}{% endif %}
+        </p>
+        {% endif %}
+        {% if event.dance_styles %}
+        <div class="flex flex-wrap gap-1 mt-2">
+          {% for style in event.dance_styles %}
+          <span class="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full">{{ style }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16 text-gray-400">
+    <p class="text-5xl mb-4">📅</p>
+    <p>暂无赛事数据，爬虫正在同步中...</p>
+  </div>
+  {% endif %}
+</section>
+
+<!-- 热门艺术家 -->
+<section>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold">艺术家</h2>
+    <a href="/artists" class="text-brand text-sm font-medium hover:underline">查看全部 →</a>
+  </div>
+  {% if artists %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    {% for artist in artists %}
+    <a href="/artists/{{ artist.id }}" class="group text-center">
+      <div class="w-20 h-20 mx-auto rounded-full overflow-hidden bg-gray-200 shadow-md group-hover:shadow-lg transition-shadow mb-2">
+        {% if artist.avatar_url %}
+        <img src="{{ artist.avatar_url }}" alt="{{ artist.name }}" class="w-full h-full object-cover"/>
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center text-3xl bg-orange-50">👤</div>
+        {% endif %}
+      </div>
+      <p class="text-sm font-medium text-gray-800 group-hover:text-brand transition-colors truncate">{{ artist.nickname or artist.name }}</p>
+      {% if artist.country %}
+      <p class="text-xs text-gray-400">{{ artist.country }}</p>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-12 text-gray-400">
+    <p class="text-5xl mb-4">🎤</p>
+    <p>暂无艺术家数据</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

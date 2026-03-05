@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#f97316"/>
+  <title>{% block title %}BBoyApp{% endblock %} — 街舞社区</title>
+  <link rel="manifest" href="/static/manifest.json"/>
+  <link rel="icon" href="/static/icons/icon-192.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: '#f97316' }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+
+<!-- 导航栏 -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2 font-bold text-xl text-brand">
+        <span class="text-2xl">🕺</span> BBoyApp
+      </a>
+
+      <!-- 桌面菜单 -->
+      <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="/events" class="hover:text-brand transition-colors {% if active_page == 'events' %}text-brand{% endif %}">赛事日历</a>
+        <a href="/artists" class="hover:text-brand transition-colors {% if active_page == 'artists' %}text-brand{% endif %}">艺术家</a>
+        <a href="/groups" class="hover:text-brand transition-colors {% if active_page == 'groups' %}text-brand{% endif %}">团队</a>
+        <a href="/stats" class="hover:text-brand transition-colors {% if active_page == 'stats' %}text-brand{% endif %}">赛事结果</a>
+        <a href="/guestboard" class="hover:text-brand transition-colors {% if active_page == 'guestboard' %}text-brand{% endif %}">留言板</a>
+      </div>
+
+      <!-- 移动端汉堡 -->
+      <button id="menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100" aria-label="菜单">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-2 text-sm font-medium">
+      <a href="/events" class="block py-2 px-3 rounded-lg hover:bg-orange-50 hover:text-brand">赛事日历</a>
+      <a href="/artists" class="block py-2 px-3 rounded-lg hover:bg-orange-50 hover:text-brand">艺术家</a>
+      <a href="/groups" class="block py-2 px-3 rounded-lg hover:bg-orange-50 hover:text-brand">团队</a>
+      <a href="/stats" class="block py-2 px-3 rounded-lg hover:bg-orange-50 hover:text-brand">赛事结果</a>
+      <a href="/guestboard" class="block py-2 px-3 rounded-lg hover:bg-orange-50 hover:text-brand">留言板</a>
+    </div>
+  </nav>
+</header>
+
+<!-- 主内容 -->
+<main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- 页脚 -->
+<footer class="bg-white border-t mt-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-gray-500 flex flex-col sm:flex-row justify-between gap-4">
+    <p>© 2026 BBoyApp — 街舞社区</p>
+    <p>数据来源：<a href="https://and8.dance" class="text-brand hover:underline" target="_blank">and8.dance</a></p>
+  </div>
+</footer>
+
+<script src="/static/js/main.js"></script>
+<script>
+  // 注册 Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/static/sw.js');
+    });
+  }
+  // 汉堡菜单
+  document.getElementById('menu-btn').addEventListener('click', () => {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+  });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
